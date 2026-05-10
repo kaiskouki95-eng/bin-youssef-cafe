@@ -3,312 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مقهى بن يوسف PRO - النظام الشامل</title>
+    <title>مقهى بن يوسف - النسخة الكاملة والمستقرة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    
     <style>
-        :root { --primary: #1e3c72; --secondary: #2a5298; --accent: #2ecc71; --danger: #e74c3c; --bg: #f4f7f6; --card: #ffffff; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; direction: rtl; color: #333; }
-        
-        /* شاشة الدخول بشعارك */
-        #loginScreen { 
-            height: 100vh; display: flex; justify-content: center; align-items: center; 
-            background: linear-gradient(rgba(30,60,114,0.85), rgba(30,60,114,0.85)), url('14311.png');
-            background-size: cover; background-position: center; position: relative;
-        }
-        .login-card { background: white; padding: 30px; border-radius: 25px; width: 320px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .logo-img { width: 130px; height: 130px; border-radius: 50%; border: 4px solid var(--primary); margin-bottom: 15px; object-fit: cover; }
-        
-        .container { max-width: 1000px; margin: 0 auto; display: none; padding-bottom: 80px; }
-        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 25px; text-align: center; border-radius: 0 0 25px 25px; position: relative; }
-        
-        .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 15px 10px; sticky; top: 0; background: var(--bg); z-index: 100; }
-        .nav-tab { padding: 12px 5px; border: none; border-radius: 12px; background: white; color: var(--primary); font-weight: 800; font-size: 0.75rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .nav-tab.active { background: var(--primary); color: white; transform: scale(1.05); }
-        
-        .card { background: white; margin: 12px; padding: 20px; border-radius: 18px; box-shadow: 0 6px 15px rgba(0,0,0,0.06); }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin-top: 10px; color: white; transition: 0.2s; }
-        .btn:active { transform: scale(0.97); }
-        
-        .input-field { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; text-align: center; font-family: 'Cairo'; font-size: 1rem; }
-        .kn-mark { position: absolute; bottom: 20px; right: 20px; color: #ff4757; font-weight: 900; font-size: 1.8rem; }
-        
+        :root { --primary: #1e3c72; --secondary: #2a5298; --accent: #2ecc71; --danger: #e74c3c; --bg: #f4f7f6; --card: #ffffff; --text: #333; --table-border: #eee; }
+        body.dark-mode { --bg: #1a1a2e; --card: #16213e; --text: #e9ecef; --table-border: #2d3436; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); direction: rtl; padding: 0; margin: 0; min-height: 100vh; transition: 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; display: none; padding: 10px; padding-bottom: 80px; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 15px; border-radius: 0 0 25px 25px; text-align: center; margin-bottom: 20px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .app-logo { width: 80px; height: 80px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; object-fit: cover; background: white; }
+        .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 10px 20px 10px; }
+        .nav-tab { padding: 12px 5px; background: var(--card); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; color: var(--primary); font-size: 0.8rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .nav-tab.active { background: var(--primary); color: white; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; margin: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid var(--table-border); }
+        .btn { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-family: 'Cairo'; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        td, th { padding: 12px 8px; border-bottom: 1px solid #f0f0f0; text-align: center; font-weight: 600; }
-        th { color: #888; font-size: 0.8rem; }
+        th { color: #777; font-size: 0.85rem; padding-bottom: 10px; border-bottom: 2px solid var(--table-border); text-align: center; }
+        td { padding: 10px 5px; border-bottom: 1px solid var(--table-border); font-weight: 600; text-align: center; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid var(--table-border); background: var(--card); color: var(--text); border-radius: 10px; margin-bottom: 10px; font-family: 'Cairo'; text-align: center; }
+        
+        .ai-btn { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 2000; font-size: 25px; border: 2px solid white; }
+        .ai-panel { position: fixed; bottom: 85px; left: 20px; width: 280px; height: 350px; background: var(--card); border-radius: 20px; display: none; flex-direction: column; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 2001; border: 1px solid var(--primary); overflow: hidden; }
+        .ai-header { background: var(--primary); color: white; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; }
 
-        .stat-box { background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center; border-right: 4px solid var(--primary); }
-        #pdfReportTemplate { position: fixed; left: -9999px; top: 0; width: 800px; background: white; padding: 50px; color: black; }
+        .kn-signature-login { position: absolute; bottom: 20px; right: 20px; color: red; font-weight: bold; font-size: 1.5rem; }
+        .cloud-indicator { position: fixed; top: 10px; left: 10px; background: white; border: 1px solid var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; color: var(--accent); z-index: 1000; font-weight: bold; display: none; }
+        #pdfReportTemplate { position: fixed; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; color: black; direction: rtl; }
     </style>
 </head>
 <body>
 
-<div id="loginScreen">
-    <div class="login-card">
-        <img src="14311.png" class="logo-img" alt="Logo">
-        <h2 style="color:var(--primary); margin:0 0 10px 0;">مقهى بن يوسف</h2>
-        <p style="font-size: 0.8rem; color: #666; margin-bottom: 20px;">نظام الإدارة السحابي المتكامل</p>
-        <input type="password" id="passInput" class="input-field" placeholder="كلمة السر">
-        <button class="btn" style="background:var(--primary);" onclick="checkPass()">دخول للنظام</button>
+<div id="pdfReportTemplate"></div>
+<div id="cloudStatus" class="cloud-indicator">☁️ سحابة نشطة</div>
+
+<div class="ai-btn" onclick="toggleAI()">🤖</div>
+<div class="ai-panel" id="aiPanel">
+    <div class="ai-header"><span>مساعد بن يوسف</span><span onclick="toggleAI()" style="cursor:pointer">✕</span></div>
+    <div id="aiContent" style="flex:1; padding:10px; overflow-y:auto; font-size:0.85rem;">مرحباً بك!</div>
+    <div style="display:flex; padding:5px; border-top:1px solid #eee;">
+        <input type="text" id="aiInput" class="input-field" placeholder="اسأل..." style="margin:0; flex:1;">
     </div>
-    <div class="kn-mark">k-N</div>
+</div>
+
+<div id="loginScreen" style="height:100vh; display:flex; justify-content:center; align-items:center; background:var(--primary); position:relative; z-index:10000;">
+    <div class="card" style="width:340px; text-align:center;">
+        <img src="https://i.imgur.com/8N6q9uX.png" class="app-logo" alt="Logo">
+        <h2 style="color:var(--primary); margin-bottom:25px; font-weight:800;">دخول بن يوسف ☕</h2>
+        <input type="password" id="passInput" class="input-field" placeholder="كلمة السر">
+        <button class="btn" style="background:var(--primary); width:100%; height:55px;" onclick="checkPass()">دخول</button>
+    </div>
+    <div class="kn-signature-login">k-N</div>
 </div>
 
 <div class="container" id="mainApp">
     <div class="header">
-        <h2 style="margin:0;">☕ لوحة تحكم بن يوسف PRO</h2>
-        <div id="syncStatus" style="font-size: 0.7rem; opacity: 0.8; margin-top: 5px;">جاري المزامنة مع السحاب...</div>
+        <img src="https://i.imgur.com/8N6q9uX.png" class="app-logo" style="width:60px; height:60px;" alt="Logo">
+        <button onclick="toggleDarkMode()" style="position:absolute; left:15px; top:15px; background:none; border:none; color:white; font-size:1.5rem;">🌓</button>
+        <h1 style="margin:0">☕ مقهى بن يوسف</h1>
     </div>
 
     <div class="nav-tabs">
-        <button class="nav-tab active" onclick="showTab('sales', this)">📊 مبيعات</button>
-        <button class="nav-tab" onclick="showTab('expenses', this)">💸 مصاريف</button>
-        <button class="nav-tab" onclick="showTab('reports', this)">📜 تقارير</button>
-        <button class="nav-tab" onclick="showTab('settings', this)">⚙️ إعدادات</button>
+        <button class="nav-tab active" onclick="showTab('sales')">📊 المبيعات</button>
+        <button class="nav-tab" onclick="showTab('WATER')">💧 المياه</button>
+        <button class="nav-tab" onclick="showTab('HOT')">🫘 البن</button>
+        <button class="nav-tab" onclick="showTab('SODA')">🥤 الغازيات</button>
+        <button class="nav-tab" onclick="showTab('JUICE')">🍹 العصائر</button>
+        <button class="nav-tab" onclick="showTab('SHISHA')">🌬️ الشيشة</button>
+        <button class="nav-tab" onclick="showTab('expenses')">💸 المصاريف</button>
+        <button class="nav-tab" onclick="showTab('settings')">⚙️ الإعدادات</button>
     </div>
 
     <div id="sales" class="tab-content">
         <div class="card">
-            <h3 style="margin-top:0">تسجيل مبيعات اليوم</h3>
-            <input type="date" id="saleDate" class="input-field">
-            <table id="salesTable">
-                <thead><tr><th>الصنف</th><th>السعر</th><th>الكمية</th></tr></thead>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0">مبيعات اليوم</h3>
+                <div style="background:#1e3c72; color:white; padding:8px 15px; border-radius:10px; font-size:0.8rem;">رصيد البن: <b id="globalCoffeeStock">0</b> كجم</div>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="date" id="saleDate" class="input-field" style="flex:2;">
+                <button class="btn" style="background:#e67e22; flex:1; font-size: 0.7rem;" onclick="generateReport('يومي')">يومي PDF</button>
+                <button class="btn" style="background:#d35400; flex:1; font-size: 0.7rem;" onclick="generateReport('شهري')">شهري PDF</button>
+            </div>
+            <table>
+                <thead><tr><th>الصنف</th><th>المخزن</th><th>تزويد</th><th>السعر</th><th>الكمية</th></tr></thead>
                 <tbody id="salesBody"></tbody>
             </table>
-            <div style="background:#fff8e1; padding:20px; border-radius:15px; text-align:center; font-weight:800; margin-top:20px; font-size:1.4rem; border: 2px dashed #f57f17;">
-                الإجمالي: <span id="totalDisplay">0.000</span> DT
-            </div>
-            <button class="btn" style="background:var(--accent); height: 55px; font-size: 1.1rem;" onclick="saveSalesToCloud()">💾 حفظ المبيعات سحابياً</button>
+            <div style="background:#fff8e1; color:#f57f17; padding:15px; border-radius:15px; font-size:1.2rem; font-weight:800; margin-top:15px;">الإجمالي: <span id="dailyTotalDisplay">0.000</span> DT</div>
+            <button class="btn" style="background:var(--primary); width:100%; height:55px; margin-top:20px;" onclick="processSale()">💾 حفظ المبيعات</button>
         </div>
     </div>
 
+    <div id="WATER" class="tab-content" style="display:none"><div class="card"><h3>💧 قسم المياه</h3><div id="btns_WATER"></div><div id="list_WATER"></div></div></div>
+    <div id="HOT" class="tab-content" style="display:none"><div class="card"><h3>🫘 قسم البن</h3><div id="btns_HOT"></div><div id="list_HOT"></div></div></div>
+    <div id="SODA" class="tab-content" style="display:none"><div class="card"><h3>🥤 قسم الغازيات</h3><div id="btns_SODA"></div><div id="list_SODA"></div></div></div>
+    <div id="JUICE" class="tab-content" style="display:none"><div class="card"><h3>🍹 قسم العصائر</h3><div id="btns_JUICE"></div><div id="list_JUICE"></div></div></div>
+    <div id="SHISHA" class="tab-content" style="display:none"><div class="card"><h3>🌬️ قسم الشيشة</h3><div id="btns_SHISHA"></div><div id="list_SHISHA"></div></div></div>
     <div id="expenses" class="tab-content" style="display:none">
-        <div class="card">
-            <h3>💸 تسجيل المصاريف</h3>
-            <input id="expName" class="input-field" placeholder="بيان المصروف (مثلاً: سكر، حليب)">
-            <input id="expVal" type="number" class="input-field" placeholder="القيمة بالدينار">
-            <button class="btn" style="background:var(--danger);" onclick="addExpense()">إضافة مصروف</button>
-            <table style="margin-top:20px;">
-                <thead><tr><th>البيان</th><th>القيمة</th><th>حذف</th></tr></thead>
-                <tbody id="expBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="reports" class="tab-content" style="display:none">
-        <div class="card">
-            <h3>📜 محرك التقارير الذكي</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn" style="background:#3498db;" onclick="generatePDF('daily')">تقرير يومي</button>
-                <button class="btn" style="background:#9b59b6;" onclick="generatePDF('monthly')">تقرير شهري</button>
-            </div>
-            <hr>
-            <div id="reportSummary" style="margin-top:15px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="stat-box"><h4>المبيعات</h4><p id="repSales">0.000</p></div>
-                <div class="stat-box"><h4>المصاريف</h4><p id="repExp">0.000</p></div>
-            </div>
-        </div>
+        <div class="card"><h3>💸 المصاريف</h3><input type="text" id="expNote" class="input-field" placeholder="البيان"><input type="number" step="0.001" id="expAmount" class="input-field" placeholder="المبلغ"><button class="btn" style="background:var(--danger); width:100%" onclick="addExpense()">➕ حفظ</button></div>
+        <div class="card"><table><thead><tr><th>البيان</th><th>المبلغ</th><th>حذف</th></tr></thead><tbody id="expensesBody"></tbody></table></div>
     </div>
 
     <div id="settings" class="tab-content" style="display:none">
         <div class="card">
-            <h3>🔐 أمن النظام</h3>
-            <input type="password" id="newPass" class="input-field" placeholder="كلمة السر الجديدة">
-            <button class="btn" style="background:#34495e;" onclick="updatePass()">تحديث كلمة السر</button>
-            <hr>
-            <h3>📦 إدارة الأصناف والمخزن</h3>
-            <input id="newItName" class="input-field" placeholder="اسم المشروب">
-            <input id="newItPrice" type="number" class="input-field" placeholder="السعر">
-            <button class="btn" style="background:var(--primary);" onclick="addNewItem()">إضافة صنف جديد</button>
-            <div id="itemsList" style="margin-top:15px;"></div>
+            <h3>⚙️ إضافة/تعديل صنف</h3>
+            <input type="text" id="itemName" class="input-field" placeholder="اسم الصنف">
+            <select id="itemCat" class="input-field"><option value="HOT">بن</option><option value="WATER">مياه</option><option value="SODA">غازيات</option><option value="JUICE">عصائر</option><option value="SHISHA">شيشة</option></select>
+            <input type="number" step="0.001" id="itemPrice" class="input-field" placeholder="السعر">
+            <input type="number" id="itemGrams" class="input-field" placeholder="جرام البن/كوب">
+            <input type="number" id="itemStock" class="input-field" placeholder="المخزن">
+            <button class="btn" style="background:var(--accent); width:100%" onclick="saveItem()">✅ حفظ الصنف</button>
         </div>
-        <div class="card" style="text-align:center;">
-            <a href="app-release.apk" style="color:var(--accent); font-weight:bold; text-decoration:none;" download>📥 تحميل تطبيق APK المحدث</a>
+        <div class="card">
+            <h3>⚠️ إدارة البيانات</h3>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <button onclick="exportData()" class="btn" style="background:#e67e22; flex:1;">📥 تصدير</button>
+                <button onclick="importData()" class="btn" style="background:#2ecc71; flex:1;">📤 استيراد</button>
+            </div>
+            <button class="btn" style="background:var(--danger); width:100%" onclick="if(confirm('هل تريد مسح كافة الأصناف؟')){db.items=[];renderAll();alert('تم التصفير');}">🧹 تصفير كافة الأصناف</button>
         </div>
+        <div class="card"><table><thead><tr><th>الصنف</th><th>السعر</th><th>المخزن</th><th>فعل</th></tr></thead><tbody id="itemsBody"></tbody></table></div>
     </div>
-</div>
-
-<div id="pdfReportTemplate">
-    <h1 style="text-align:center; color:#1e3c72;">تقرير مقهى بن يوسف PRO</h1>
-    <h3 id="pdfTitle" style="text-align:center; border-bottom:2px solid #333; padding-bottom:10px;"></h3>
-    <table style="width:100%; border:1px solid #000; margin-top:20px;">
-        <thead><tr style="background:#eee;"><th>التاريخ/البيان</th><th>الصنف</th><th>الكمية/القيمة</th><th>المجموع</th></tr></thead>
-        <tbody id="pdfRows"></tbody>
-    </table>
-    <div style="margin-top:30px; font-size:1.4rem; text-align:right;">
-        <p id="pdfFinalSales"></p>
-        <p id="pdfFinalExp" style="color:red;"></p>
-        <p id="pdfNetProfit" style="font-weight:bold; border-top:2px solid #000;"></p>
-    </div>
-    <div style="margin-top:50px; color:red; font-weight:bold;">الختم الرقمي: k-N</div>
 </div>
 
 <script>
-    // --- إعدادات Firebase ---
-    const firebaseConfig = {
-        apiKey: "AIzaSy...", 
-        authDomain: "bin-youssef-cafe.firebaseapp.com",
-        projectId: "bin-youssef-cafe",
-        storageBucket: "bin-youssef-cafe.appspot.com",
-        messagingSenderId: "58182949",
-        appId: "1:..."
-    };
+    const firebaseConfig = { apiKey: "AIzaSyAwtYqO6xeoHG-tTF81Gc24tQbN_6eUGX8", authDomain: "bin-youssef-cafe.firebaseapp.com", projectId: "bin-youssef-cafe", appId: "1:369013953473:web:0d8e4f85dc662452ea5540" };
+    firebase.initializeApp(firebaseConfig);
+    const fs = firebase.firestore();
+    const DB_KEY = 'BIN_YOUSSEF_V200_FIX';
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    
-    // هيكل البيانات الشامل
-    let appData = { items: [], salesHistory: [], expHistory: [], appPass: "1234" };
+    let db = JSON.parse(localStorage.getItem(DB_KEY)) || { items: [], history: [], expenses: [], coffeeStock: 0, appPass: "1234" };
 
     function checkPass() {
-        if (document.getElementById('passInput').value === (appData.appPass || "1234")) {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('saleDate').valueAsDate = new Date();
-            startSync();
-        } else { alert("كلمة السر خاطئة يا كايس!"); }
+        const val = document.getElementById('passInput').value;
+        if(val === db.appPass || val === "1234") {
+            document.getElementById('loginScreen').style.display='none';
+            document.getElementById('mainApp').style.display='block';
+            initApp();
+        } else alert("خطأ!");
     }
 
-    function startSync() {
-        db.collection("management").doc("cloudData").onSnapshot(doc => {
-            if (doc.exists) {
-                appData = doc.data();
-                renderAll();
-                document.getElementById('syncStatus').innerText = "☁️ البيانات مزامنة بالكامل";
-            }
-        });
-    }
-
-    async function pushToCloud() {
-        await db.collection("management").doc("cloudData").set(appData);
+    async function initApp() {
+        document.getElementById('saleDate').valueAsDate = new Date();
+        renderAll();
+        try { const doc = await fs.collection("cafe_data").doc("main").get(); if(doc.exists){ db = doc.data(); renderAll(); document.getElementById('cloudStatus').style.display='block'; } } catch(e){}
     }
 
     function renderAll() {
-        // رندر المبيعات
-        const sBody = document.getElementById('salesBody');
-        sBody.innerHTML = appData.items.map((it, i) => `
-            <tr>
-                <td>${it.name}</td>
-                <td>${it.price.toFixed(3)}</td>
-                <td><input type="number" class="qty-input input-field" data-idx="${i}" value="0" oninput="calcTotal()" style="width:70px; margin:0;"></td>
-            </tr>`).join('');
-
-        // رندر المصاريف
-        const date = document.getElementById('saleDate').value;
-        const eBody = document.getElementById('expBody');
-        const dailyExp = appData.expHistory.filter(e => e.date === date);
-        eBody.innerHTML = dailyExp.map((e, i) => `
-            <tr><td>${e.name}</td><td>${e.val.toFixed(3)}</td><td><button onclick="deleteExp(${i})">❌</button></td></tr>`).join('');
-
-        // رندر قائمة الأصناف في الإعدادات
-        document.getElementById('itemsList').innerHTML = appData.items.map((it, i) => `
-            <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee;">
-                <span>${it.name} (${it.price.toFixed(3)})</span>
-                <button onclick="deleteItem(${i})">🗑️</button>
-            </div>`).join('');
+        document.getElementById('globalCoffeeStock').innerText = db.coffeeStock.toFixed(3);
+        renderSales(); renderSettings(); renderExpenses();
+        ['HOT', 'WATER','SODA','JUICE','SHISHA'].forEach(c => renderCategorySection(c));
+        saveDB();
     }
 
-    // --- العمليات ---
+    function renderCategorySection(cat) {
+        const btns = document.getElementById('btns_' + cat);
+        const list = document.getElementById('list_' + cat);
+        if(btns) btns.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px;"><button class="btn" style="background:#e67e22; flex:1; font-size:0.7rem;" onclick="generateReport('يومي','${cat}')">يومي PDF</button><button class="btn" style="background:#d35400; flex:1; font-size:0.7rem;" onclick="generateReport('شهري','${cat}')">شهري PDF</button></div>`;
+        const filtered = db.items.filter(i => i.cat === cat);
+        if(list) list.innerHTML = `<table><tbody>` + filtered.map(i => `<tr><td>${i.name}</td><td><b>${i.stock}</b></td><td><button onclick="quickAdd('${i.name}')">+</button></td></tr>`).join('') + `</tbody></table>`;
+    }
 
-    async function saveSalesToCloud() {
+    function renderSales() {
+        document.getElementById('salesBody').innerHTML = db.items.map((it, i) => `<tr><td>${it.name}</td><td>${it.cat==='HOT'?'--':it.stock}</td><td><button onclick="quickAdd('${it.name}')">+</button></td><td>${it.price.toFixed(3)}</td><td><input type="number" class="qty-in input-field" data-idx="${i}" value="0" oninput="calcTotal()" style="width:50px; margin:0;"></td></tr>`).join('');
+    }
+
+    async function generateReport(type, category = null) {
+        const dateVal = document.getElementById('saleDate').value;
+        const monthVal = dateVal.substring(0, 7);
+        const template = document.getElementById('pdfReportTemplate');
+        let reportData = db.history.filter(h => (type==='يومي'?h.date===dateVal:h.date.startsWith(monthVal)) && (category?h.cat===category:true));
+        let totalIncome = reportData.reduce((s, h) => s + h.total, 0);
+        let expTotal = db.expenses.filter(e => type==='يومي'?e.date===dateVal:e.date.startsWith(monthVal)).reduce((s, e) => s + e.amount, 0);
+
+        template.innerHTML = `<div style="text-align:center;"><h2>تقرير ${type} - مقهى بن يوسف</h2><p>${dateVal}</p></div>
+        <table style="width:100%; border-collapse:collapse; margin-top:20px;" border="1">
+            <thead><tr style="background:#eee;"><th>الصنف</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
+            <tbody>${reportData.map(h => `<tr><td>${h.name}</td><td>${h.qty}</td><td>${h.total.toFixed(3)}</td></tr>`).join('')}</tbody>
+        </table><div style="margin-top:20px; font-weight:bold;"><p>المبيعات: ${totalIncome.toFixed(3)}</p><p>المصاريف: ${expTotal.toFixed(3)}</p><p>الصافي: ${(totalIncome-expTotal).toFixed(3)} DT</p></div>`;
+        
+        const canvas = await html2canvas(template);
+        const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 190, 0);
+        pdf.save(`Report_${type}.pdf`);
+    }
+
+    function processSale() {
         const date = document.getElementById('saleDate').value;
-        document.querySelectorAll('.qty-input').forEach(inp => {
-            const q = parseFloat(inp.value) || 0;
-            if (q > 0) {
-                const it = appData.items[inp.dataset.idx];
-                appData.salesHistory.push({ date, name: it.name, qty: q, total: q * it.price });
-                inp.value = 0;
+        let isChanged = false;
+        document.querySelectorAll('.qty-in').forEach(inp => {
+            const q = parseFloat(inp.value)||0; if(q > 0) {
+                const it = db.items[inp.dataset.idx];
+                if(it.cat === 'HOT') db.coffeeStock -= (q * it.grams / 1000); else it.stock -= q;
+                db.history.push({ date, name: it.name, cat: it.cat, qty: q, total: (q * it.price) });
+                inp.value = 0; isChanged = true;
             }
         });
-        await pushToCloud();
-        alert("تم حفظ المبيعات في السحاب! ☁️");
+        if(isChanged) { renderAll(); alert("تم الحفظ"); }
     }
 
-    async function addExpense() {
-        const name = document.getElementById('expName').value;
-        const val = parseFloat(document.getElementById('expVal').value);
-        const date = document.getElementById('saleDate').value;
-        if(name && val) {
-            appData.expHistory.push({ date, name, val });
-            document.getElementById('expName').value = '';
-            document.getElementById('expVal').value = '';
-            await pushToCloud();
-        }
+    function saveItem() { 
+        const it = { name: document.getElementById('itemName').value, cat: document.getElementById('itemCat').value, price: parseFloat(document.getElementById('itemPrice').value)||0, grams: parseFloat(document.getElementById('itemGrams').value)||0, stock: parseFloat(document.getElementById('itemStock').value)||0 }; 
+        const idx = db.items.findIndex(i => i.name === it.name); 
+        if(idx > -1) db.items[idx] = it; else db.items.push(it); 
+        renderAll(); 
     }
 
-    async function updatePass() {
-        const p = document.getElementById('newPass').value;
-        if(p.length >= 4) {
-            appData.appPass = p;
-            await pushToCloud();
-            alert("تم تغيير كلمة السر بنجاح!");
-        }
-    }
+    function renderSettings() { document.getElementById('itemsBody').innerHTML = db.items.map((it, i) => `<tr><td>${it.name}</td><td>${it.price.toFixed(3)}</td><td>${it.stock}</td><td><button onclick="editItem(${i})">✏️</button> <button onclick="db.items.splice(${i},1);renderAll()">🗑️</button></td></tr>`).join(''); }
+    function editItem(i) { const it = db.items[i]; document.getElementById('itemName').value=it.name; document.getElementById('itemCat').value=it.cat; document.getElementById('itemPrice').value=it.price; document.getElementById('itemGrams').value=it.grams; document.getElementById('itemStock').value=it.stock; }
+    function calcTotal() { let t = 0; document.querySelectorAll('.qty-in').forEach(inp => t += (parseFloat(inp.value)||0) * db.items[inp.dataset.idx].price); document.getElementById('dailyTotalDisplay').innerText = t.toFixed(3); }
+    function quickAdd(n) { const v = prompt("الكمية:"); if(v) { db.items.find(i => i.name === n).stock += parseFloat(v); renderAll(); } }
+    function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.style.display='none'); document.getElementById(id).style.display='block'; }
+    function addExpense() { db.expenses.push({ date: document.getElementById('saleDate').value, note: document.getElementById('expNote').value, amount: parseFloat(document.getElementById('expAmount').value)||0 }); renderAll(); }
+    function renderExpenses() { const d = document.getElementById('saleDate').value; document.getElementById('expensesBody').innerHTML = db.expenses.filter(e => e.date === d).map((e, i) => `<tr><td>${e.note}</td><td>${e.amount.toFixed(3)}</td><td><button onclick="db.expenses.splice(${i},1);renderAll()">🗑️</button></td></tr>`).join(''); }
+    
+    function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(db)], {type:'application/json'})); a.download = `Backup_BenYoussef.json`; a.click(); }
+    function importData() { const inp = document.createElement('input'); inp.type='file'; inp.onchange = e => { const r = new FileReader(); r.onload = ev => { db = JSON.parse(ev.target.result); renderAll(); alert("تم الاستيراد بنجاح"); }; r.readAsText(e.target.files[0]); }; inp.click(); }
 
-    async function generatePDF(type) {
-        const date = document.getElementById('saleDate').value;
-        const month = date.substring(0, 7);
-        let logs = [], expenses = [], title = "";
-
-        if (type === 'daily') {
-            logs = appData.salesHistory.filter(s => s.date === date);
-            expenses = appData.expHistory.filter(e => e.date === date);
-            title = `تقرير يوم: ${date}`;
-        } else {
-            logs = appData.salesHistory.filter(s => s.date.startsWith(month));
-            expenses = appData.expHistory.filter(e => e.date.startsWith(month));
-            title = `تقرير شهر: ${month}`;
-        }
-
-        let sTotal = 0, eTotal = 0;
-        let rowsHtml = logs.map(l => {
-            sTotal += l.total;
-            return `<tr><td>${l.date}</td><td>${l.name}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`;
-        }).join('');
-        
-        rowsHtml += `<tr><td colspan="4" style="background:#f0f0f0;">المصاريف</td></tr>`;
-        rowsHtml += expenses.map(e => {
-            eTotal += e.val;
-            return `<tr><td>${e.date}</td><td>${e.name}</td><td>---</td><td>${e.val.toFixed(3)}</td></tr>`;
-        }).join('');
-
-        document.getElementById('pdfRows').innerHTML = rowsHtml;
-        document.getElementById('pdfTitle').innerText = title;
-        document.getElementById('pdfFinalSales').innerText = `إجمالي المبيعات: ${sTotal.toFixed(3)} DT`;
-        document.getElementById('pdfFinalExp').innerText = `إجمالي المصاريف: ${eTotal.toFixed(3)} DT`;
-        document.getElementById('pdfNetProfit').innerText = `صافي الربح: ${(sTotal - eTotal).toFixed(3)} DT`;
-
-        const canvas = await html2canvas(document.getElementById('pdfReportTemplate'));
-        const pdf = new jspdf.jsPDF();
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 190, 0);
-        pdf.save(`Mawadi_Pro_${type}_${date}.pdf`);
-    }
-
-    // المساعدات
-    function calcTotal() {
-        let t = 0;
-        document.querySelectorAll('.qty-input').forEach(inp => t += (parseFloat(inp.value)||0) * appData.items[inp.dataset.idx].price);
-        document.getElementById('totalDisplay').innerText = t.toFixed(3);
-    }
-    function showTab(id, btn) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
-        document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).style.display='block';
-        btn.classList.add('active');
-    }
-    async function addNewItem() {
-        const n = document.getElementById('newItName').value;
-        const p = parseFloat(document.getElementById('newItPrice').value);
-        if(n && p) { appData.items.push({name:n, price:p}); await pushToCloud(); }
-    }
-    async function deleteItem(i) { if(confirm("حذف الصنف؟")) { appData.items.splice(i,1); await pushToCloud(); } }
-    async function deleteExp(i) { appData.expHistory.splice(i,1); await pushToCloud(); }
+    async function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); try { await fs.collection("cafe_data").doc("main").set(db); } catch(e){} }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+    function toggleAI() { const p = document.getElementById('aiPanel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; }
 </script>
 </body>
 </html>
