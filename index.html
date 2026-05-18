@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مقهى بن يوسف - النسخة الكاملة والمستقرة</title>
+    <title>مقهى بن يوسف - النسخة المستقرة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -28,10 +28,6 @@
         td { padding: 10px 5px; border-bottom: 1px solid var(--table-border); font-weight: 600; text-align: center; }
         .input-field { width: 100%; padding: 12px; border: 1px solid var(--table-border); background: var(--card); color: var(--text); border-radius: 10px; margin-bottom: 10px; font-family: 'Cairo'; text-align: center; }
         
-        .ai-btn { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 2000; font-size: 25px; border: 2px solid white; }
-        .ai-panel { position: fixed; bottom: 85px; left: 20px; width: 280px; height: 350px; background: var(--card); border-radius: 20px; display: none; flex-direction: column; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 2001; border: 1px solid var(--primary); overflow: hidden; }
-        .ai-header { background: var(--primary); color: white; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; }
-
         .kn-signature-login { position: absolute; bottom: 20px; right: 20px; color: red; font-weight: bold; font-size: 1.5rem; }
         .cloud-indicator { position: fixed; top: 10px; left: 10px; background: white; border: 1px solid var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; color: var(--accent); z-index: 1000; font-weight: bold; display: none; }
         #pdfReportTemplate { position: fixed; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; color: black; direction: rtl; }
@@ -42,19 +38,10 @@
 <div id="pdfReportTemplate"></div>
 <div id="cloudStatus" class="cloud-indicator">☁️ سحابة نشطة</div>
 
-<div class="ai-btn" onclick="toggleAI()">🤖</div>
-<div class="ai-panel" id="aiPanel">
-    <div class="ai-header"><span>مساعد بن يوسف</span><span onclick="toggleAI()" style="cursor:pointer">✖</span></div>
-    <div id="aiContent" style="flex:1; padding:10px; overflow-y:auto; font-size:0.85rem;">مرحباً بك!</div>
-    <div style="display:flex; padding:5px; border-top:1px solid #eee;">
-        <input type="text" id="aiInput" class="input-field" placeholder="اسأل..." style="margin:0; flex:1;">
-    </div>
-</div>
-
 <div id="loginScreen" style="height:100vh; display:flex; justify-content:center; align-items:center; background:var(--primary); position:relative; z-index:10000;">
     <div class="card" style="width:340px; text-align:center;">
         <img src="https://i.imgur.com/8N6q9uX.png" class="app-logo" alt="Logo">
-        <h2 style="color:white; margin-bottom:25px; font-weight:800;">دخول بن يوسف ☕</h2>
+        <h2 style="color:var(--primary); margin-bottom:25px; font-weight:800;">دخول بن يوسف ☕</h2>
         <input type="password" id="passInput" class="input-field" placeholder="كلمة السر">
         <button class="btn" style="background:#2a5298; width:100%; height:55px;" onclick="checkPass()">دخول</button>
     </div>
@@ -138,22 +125,23 @@
 </div>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyAwtYqO6xeoHG-tTF81Gc24tQbN_6eUGX8", authDomain: "bin-youssef-cafe.firebaseapp.com", projectId: "bin-youssef-cafe", appId: "1:369013953473:web:0d8e4f85dc662452ea5540" };
-    firebase.initializeApp(firebaseConfig);
-    const fs = firebase.firestore();
+    // تهيئة فايربيس
+    try {
+        const firebaseConfig = { apiKey: "AIzaSyAwtYqO6xeoHG-tTF81Gc24tQbN_6eUGX8", authDomain: "bin-youssef-cafe.firebaseapp.com", projectId: "bin-youssef-cafe", appId: "1:369013953473:web:0d8e4f85dc662452ea5540" };
+        firebase.initializeApp(firebaseConfig);
+        window.fs = firebase.firestore();
+    } catch(e) { console.log("Firebase setup bypassed"); }
     
-    const DB_KEY = 'BIN_YOUSSEF_V500_STABLE';
-
+    const DB_KEY = 'BIN_YOUSSEF_V600_LOCALFIRST';
     let db = JSON.parse(localStorage.getItem(DB_KEY)) || { items: [], history: [], expenses: [], coffeeStock: 0, appPass: "1234" };
 
     function checkPass() {
         const val = document.getElementById('passInput').value.trim();
-        
-        // التحقق فوري ومحلي تماماً دون انتظار السحابة لتجنب أي تعليق
-        if (val === "1234" || (db && db.appPass && val === db.appPass)) {
+        // الدخول محلي ومباشر 100% ولن يعلق الزر مهما كانت حالة الشبكة
+        if (val === "1234" || val === db.appPass) {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
-            initApp(); // تشغيل التطبيق وجلب البيانات السحابية بأمان بعد الدخول
+            initApp();
         } else {
             alert("خطأ في كلمة السر!");
         }
@@ -163,14 +151,16 @@
         document.getElementById('saleDate').valueAsDate = new Date();
         renderAll();
         
-        // جلب البيانات يتم خلف الكواليس تماماً حتى لا يعطل الواجهة أبداً
-        fs.collection("cafe_data").doc("main").get().then(doc => {
-            if(doc.exists){ 
-                db = doc.data(); 
-                renderAll(); 
-                document.getElementById('cloudStatus').style.display='block'; 
-            }
-        }).catch(e => console.log("Cloud sync delayed"));
+        // محاولة جلب البيانات من السحابة دون تأخير الواجهة الأساسية
+        if(window.fs) {
+            window.fs.collection("cafe_data").doc("main").get().then(doc => {
+                if(doc.exists){ 
+                    db = doc.data(); 
+                    renderAll(); 
+                    document.getElementById('cloudStatus').style.display='block'; 
+                }
+            }).catch(e => console.log("Cloud read offline, switching to local storage."));
+        }
     }
 
     function renderAll() {
@@ -197,8 +187,7 @@
         const amount = prompt("أدخل كمية البن المضافة (بالكيلو جرام):");
         if(amount && !isNaN(amount)) {
             db.coffeeStock = (parseFloat(db.coffeeStock) || 0) + parseFloat(amount);
-            renderAll();
-            saveDB();
+            renderAll(); saveDB();
             alert("تم تحديث رصيد البن بنجاح");
         }
     }
@@ -267,3 +256,12 @@
     function showTab(id) { document.querySelectorAll('.tab-content').forEach(t => t.style.display='none'); document.getElementById(id).style.display='block'; }
     function addExpense() { db.expenses.push({ date: document.getElementById('saleDate').value, note: document.getElementById('expNote').value, amount: parseFloat(document.getElementById('expAmount').value)||0 }); renderAll(); saveDB(); }
     function renderExpenses() { const d = document.getElementById('saleDate').value; document.getElementById('expensesBody').innerHTML = db.expenses.filter(e => e.date === d).map((e, i) => `<tr><td>${e.note}</td><td>${e.amount.toFixed(3)}</td><td><button onclick="db.expenses.splice(${i},1);renderAll();saveDB();">🗑️</button></td></tr>`).join(''); }
+    
+    function exportData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(db)], {type:'application/json'})); a.download = `Backup_BenYoussef.json`; a.click(); }
+    function importData() { const inp = document.createElement('input'); inp.type='file'; inp.onchange = e => { const r = new FileReader(); r.onload = ev => { db = JSON.parse(ev.target.result); renderAll(); saveDB(); alert("تم الاستيراد بنجاح"); }; r.readAsText(e.target.files[0]); }; inp.click(); }
+
+    async function saveDB() { if(window.fs) { try { await window.fs.collection("cafe_data").doc("main").set(db); } catch(e){} } }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+</script>
+</body>
+</html>
